@@ -12,6 +12,10 @@ import Footer from '../../components/Footer';
 import Loader from '../../components/Loader';
 
 const AdminLoginPage = () => {
+  const defaultAdminCredentials = {
+    email: 'admin@admin.com',
+    password: 'admin123'
+  };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -56,6 +60,16 @@ const AdminLoginPage = () => {
         <FormContainer>
           <Card className='p-3 p-md-5 '>
             <h1 className='mb-5 text-center'>Sign In</h1>
+            <Button
+              variant="info"
+              className="w-100 mb-4"
+              onClick={() => {
+                setEmail(defaultAdminCredentials.email);
+                setPassword(defaultAdminCredentials.password);
+              }}
+            >
+              Use Default Admin Credentials
+            </Button>
             <Form onSubmit={submitHandler}>
               <Form.Group className='mb-3' controlId='email'>
                 <Form.Label>Email address</Form.Label>

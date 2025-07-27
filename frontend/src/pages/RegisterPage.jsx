@@ -44,18 +44,44 @@ const RegisterPage = () => {
 
   const submitHandler = async e => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error('Passwords do not match!');
+
+    // Validate required fields
+    if (!name || !email || !password || !confirmPassword) {
+      toast.error('Please fill in all fields');
       return;
-    } else {
-      try {
-        const res = await register({ name, email, password }).unwrap();
-        dispatch(setCredentials({ ...res }));
-        navigate(redirect);
-        toast.success('Registration successful. Welcome!');
-      } catch (error) {
-        toast.error(error?.data?.message || error.error);
-      }
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters long');
+      return;
+    }
+
+    // Validate password match
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    try {
+      const res = await register({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        password
+      }).unwrap();
+
+      dispatch(setCredentials({ ...res }));
+      navigate(redirect);
+      toast.success('Registration successful!');
+    } catch (err) {
+      toast.error(err?.data?.message || 'Registration failed. Please try again.');
     }
   };
 

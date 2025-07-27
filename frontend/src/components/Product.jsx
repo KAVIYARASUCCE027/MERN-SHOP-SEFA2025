@@ -22,11 +22,44 @@ const Product = ({ product }) => {
         style={{ textDecoration: 'none' }}
         className='text-dark'
       >
-        <Card.Img
-          variant='top'
-          src={product.image}
-          style={{ height: '200px', objectFit: 'contain' }}
-        />
+        <div 
+          style={{ 
+            paddingTop: '100%', /* 1:1 aspect ratio */
+            position: 'relative',
+            backgroundColor: '#f8f9fa',
+            marginBottom: '0.5rem'
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem'
+            }}
+          >
+            <Card.Img
+              variant='top'
+              src={product.image || '/default-product.png'}
+              style={{
+                maxWidth: '100%',
+                maxHeight: '100%',
+                objectFit: 'contain',
+                transition: 'none'
+              }}
+              alt={product.name}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = '/default-product.png';
+              }}
+            />
+          </div>
+        </div>
         <Card.Body>
           <Card.Title as='div' className='product-title'>
             <strong>{product.name}</strong>

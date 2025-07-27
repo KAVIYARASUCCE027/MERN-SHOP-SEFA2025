@@ -102,55 +102,54 @@ const router = createBrowserRouter([
     ]
   },
   {
-    path: '/admin/login',
-    element: <AdminLoginPage />
-  },
-  {
-    path: '',
+    path: '/admin',
     element: <AdminDashboard />,
     children: [
       {
-        path: '',
+        path: 'login',
+        element: <AdminLoginPage />
+      },
+      {
         element: <AdminRoute />,
         children: [
           {
-            path: '/admin/dashboard',
+            path: 'dashboard',
             element: <Dashboard />
           },
           {
-            path: '/admin/order-list',
+            path: 'order-list',
             element: <OrderListPage />
           },
           {
-            path: '/admin/product-list',
+            path: 'product-list',
             element: <ProductListPage />
           },
           {
-            path: '/admin/user-list',
+            path: 'user-list',
             element: <UserListPage />
           },
           {
-            path: '/admin/product/create',
+            path: 'product/create',
             element: <ProductFormPage />
           },
           {
-            path: '/admin/profile',
+            path: 'profile',
             element: <AdminProfilePage />
           },
           {
-            path: '/admin/admin-list',
+            path: 'admin-list',
             element: <AdminListPage />
           },
           {
-            path: '/admin/order/:id',
+            path: 'order/:id',
             element: <OrderDetailsPage />
           },
           {
-            path: '/admin/user/update/:id',
+            path: 'user/update/:id',
             element: <UpdateUserFormPage />
           },
           {
-            path: '/admin/product/update/:id',
+            path: 'product/update/:id',
             element: <ProductFormPage />
           }
         ]

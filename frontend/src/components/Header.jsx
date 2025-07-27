@@ -63,6 +63,11 @@ const Header = () => {
                 )}
               </Nav.Link>
             </LinkContainer>
+            <LinkContainer to='/admin/login'>
+              <Nav.Link className='text-warning'>
+                Admin Login
+              </Nav.Link>
+            </LinkContainer>
             {userInfo ? (
               <NavDropdown title={`Hello👋, ${userInfo.name}`} id='username'>
                 <LinkContainer to='/profile'>

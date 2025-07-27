@@ -19,22 +19,21 @@ const ProductFormPage = () => {
   const isUpdateMode = !!productId;
 
   const [name, setName] = useState('');
+  const [price, setPrice] = useState(0);
   const [image, setImage] = useState('');
-  const [description, setDescription] = useState('');
   const [brand, setBrand] = useState('');
   const [category, setCategory] = useState('');
-  const [price, setPrice] = useState(0);
   const [countInStock, setCountInStock] = useState(0);
-
-  const getProductQueryResult = useGetProductDetailsQuery(productId);
+  const [description, setDescription] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   const {
     data: product,
     isLoading,
     error
-  } = isUpdateMode
-    ? getProductQueryResult
-    : { data: null, isLoading: false, error: null };
+  } = useGetProductDetailsQuery(productId, {
+    skip: !isUpdateMode
+  });
 
   const [createProduct, { isLoading: isCreateProductLoading }] =
     useCreateProductMutation();
@@ -58,19 +57,51 @@ const ProductFormPage = () => {
   }, [isUpdateMode, product]);
 
   const uploadFileHandler = async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Please upload a JPEG, JPG or PNG image');
+      return;
+    }
+
+    // Validate file size (5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      toast.error('File size must be less than 5MB');
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('image', e.target.files[0]);
+    formData.append('image', file);
+
     try {
+      setUploading(true);
       const res = await uploadProductImage(formData).unwrap();
-      setImage(res.imageUrl);
-      toast.success(res.message);
-    } catch (error) {
-      toast.error(error?.data?.message || error.error);
+      if (res.imageUrl) {
+        setImage(res.imageUrl);
+        toast.success('Image uploaded successfully');
+      } else {
+        toast.error('Failed to get image URL from server');
+      }
+    } catch (err) {
+      toast.error(err?.data?.message || 'Error uploading image');
+      console.error('Upload error:', err);
+    } finally {
+      setUploading(false);
     }
   };
 
   const submitHandler = async e => {
     e.preventDefault();
+
+    if (!name || !description || !brand || !category || !price || !countInStock) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
     try {
       const productData = {
         name,
@@ -78,19 +109,19 @@ const ProductFormPage = () => {
         description,
         brand,
         category,
-        price,
-        countInStock
+        price: Number(price),
+        countInStock: Number(countInStock)
       };
+
       if (isUpdateMode) {
-        const { data } = await updateProduct({
+        await updateProduct({
           productId,
           ...productData
-        });
-        toast.success(data.message);
+        }).unwrap();
+        toast.success('Product updated successfully');
       } else {
-        const { data } = await createProduct(productData);
-
-        toast.success(data.message);
+        await createProduct(productData).unwrap();
+        toast.success('Product created successfully');
       }
       navigate('/admin/product-list');
     } catch (error) {
@@ -138,12 +169,22 @@ const ProductFormPage = () => {
               ></Form.Control>
             </Form.Group>
 
-            <Form.Group controlId='image'>
-              <Form.Label>Image</Form.Label>
+            <Form.Group controlId='image' className='my-2'>
+              <Form.Label>Image <small className='text-muted'>(Recommended: 800x800px square image)</small></Form.Label>
+              <Form.Control
+                type='text'
+                placeholder='Enter image url'
+                value={image}
+                onChange={e => setImage(e.target.value)}
+              ></Form.Control>
               <Form.Control
                 type='file'
+                label='Choose file'
                 onChange={uploadFileHandler}
+                disabled={uploading}
+                className='mt-2'
               ></Form.Control>
+              {uploading && <Loader />}
             </Form.Group>
 
             <Form.Group controlId='brand'>

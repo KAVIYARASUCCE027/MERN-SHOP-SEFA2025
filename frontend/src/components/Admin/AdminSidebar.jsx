@@ -25,11 +25,13 @@ const Sidebar = () => {
     try {
       await logoutApiCall().unwrap();
       dispatch(logout());
-
       navigate('/admin/login');
       toast.success('Logout successful');
     } catch (error) {
-      toast.error(error?.data?.message || error.error);
+      // Even if API call fails, proceed with local logout
+      dispatch(logout());
+      navigate('/admin/login');
+      toast.success('Logout successful');
     }
   };
   return (
